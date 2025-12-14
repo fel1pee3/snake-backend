@@ -28,5 +28,5 @@ export const GAME_CONFIG = {
 
 export const SERVER_CONFIG = {
   PORT: 5000,
-  CORS_ORIGIN: 'http://localhost:3001',
+  CORS_ORIGIN: '*', // Permite todas as origens
 };

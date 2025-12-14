@@ -24,5 +24,5 @@ exports.GAME_CONFIG = {
 };
 exports.SERVER_CONFIG = {
     PORT: 5000,
-    CORS_ORIGIN: 'http://localhost:3001',
+    CORS_ORIGIN: '*', // Permite todas as origens
 };

@@ -44,6 +44,12 @@ class GameService {
         logger_1.Logger.info(SCOPE, `Jogador ${playerId} entrou (Total: ${this.connectedPlayers.size})`);
     }
     /**
+     * Retorna a quantidade de jogadores conectados
+     */
+    getConnectedPlayersCount() {
+        return this.connectedPlayers.size;
+    }
+    /**
      * Remove um jogador do jogo
      */
     removePlayer(playerId) {
@@ -69,19 +75,25 @@ class GameService {
     }
     /**
      * Inicia o jogo
+     * Não permite reiniciar se já está em andamento
      */
     startGame() {
         if (this.connectedPlayers.size < 1) {
             logger_1.Logger.warn(SCOPE, 'Tentativa de iniciar jogo sem jogadores');
             return false;
         }
-        // Se o jogo está em andamento, reseta completamente antes de iniciar novamente
-        if (this.status === 'playing' || this.status === 'finished') {
+        // Se o jogo já está em andamento, ignora
+        if (this.status === 'playing') {
+            logger_1.Logger.warn(SCOPE, 'Tentativa de iniciar jogo que já está em andamento');
+            return false;
+        }
+        // Se terminou, reseta antes de iniciar novo
+        if (this.status === 'finished') {
             this.resetGame();
         }
         logger_1.Logger.info(SCOPE, `Iniciando jogo com ${this.connectedPlayers.size} jogador(es)`);
         this.status = 'playing';
-        // Criar cobras para cada jogador conectado
+        // Criar cobras para cada jogador conectado (se não tiver já)
         for (const playerId of this.connectedPlayers) {
             if (!this.gameState.snakes.has(playerId)) {
                 this.createSnake(playerId);
@@ -89,6 +101,15 @@ class GameService {
         }
         this.startGameLoop();
         return true;
+    }
+    /**
+     * Adiciona uma nova cobra para um jogador que entrou durante o jogo
+     */
+    addPlayerDuringGame(playerId) {
+        if (this.status === 'playing' && !this.gameState.snakes.has(playerId)) {
+            this.createSnake(playerId);
+            logger_1.Logger.info(SCOPE, `Nova cobra criada para jogador ${playerId} durante jogo`);
+        }
     }
     /**
      * Cria uma cobra para um jogador

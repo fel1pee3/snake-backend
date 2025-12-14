@@ -56,6 +56,13 @@ export class GameService {
   }
 
   /**
+   * Retorna a quantidade de jogadores conectados
+   */
+  getConnectedPlayersCount(): number {
+    return this.connectedPlayers.size;
+  }
+
+  /**
    * Remove um jogador do jogo
    */
   removePlayer(playerId: string): void {
@@ -86,6 +93,7 @@ export class GameService {
 
   /**
    * Inicia o jogo
+   * Não permite reiniciar se já está em andamento
    */
   startGame(): boolean {
     if (this.connectedPlayers.size < 1) {
@@ -93,15 +101,21 @@ export class GameService {
       return false;
     }
 
-    // Se o jogo está em andamento, reseta completamente antes de iniciar novamente
-    if (this.status === 'playing' || this.status === 'finished') {
+    // Se o jogo já está em andamento, ignora
+    if (this.status === 'playing') {
+      Logger.warn(SCOPE, 'Tentativa de iniciar jogo que já está em andamento');
+      return false;
+    }
+
+    // Se terminou, reseta antes de iniciar novo
+    if (this.status === 'finished') {
       this.resetGame();
     }
 
     Logger.info(SCOPE, `Iniciando jogo com ${this.connectedPlayers.size} jogador(es)`);
     this.status = 'playing';
 
-    // Criar cobras para cada jogador conectado
+    // Criar cobras para cada jogador conectado (se não tiver já)
     for (const playerId of this.connectedPlayers) {
       if (!this.gameState.snakes.has(playerId)) {
         this.createSnake(playerId);
@@ -110,6 +124,16 @@ export class GameService {
 
     this.startGameLoop();
     return true;
+  }
+
+  /**
+   * Adiciona uma nova cobra para um jogador que entrou durante o jogo
+   */
+  addPlayerDuringGame(playerId: string): void {
+    if (this.status === 'playing' && !this.gameState.snakes.has(playerId)) {
+      this.createSnake(playerId);
+      Logger.info(SCOPE, `Nova cobra criada para jogador ${playerId} durante jogo`);
+    }
   }
 
   /**
