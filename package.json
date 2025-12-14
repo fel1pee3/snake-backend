@@ -1,0 +1,20 @@
+{
+  "name": "snake-backend",
+  "version": "1.0.0",
+  "description": "Snake multiplayer backend",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "npm run build && node dist/index.js",
+    "dev": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "socket.io": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5",
+    "ts-node": "^10.9.1"
+  }
+}
